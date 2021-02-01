@@ -1,0 +1,54 @@
+Option Explicit
+
+Sub Send_Mails()
+Dim sh As Worksheet
+Dim fr As Worksheet
+Set sh = ThisWorkbook.Sheets("Send_Mails")
+Set fr = ThisWorkbook.Sheets("Form")
+Dim i As Integer
+
+Dim materi, topik, waktu As String
+
+Dim OA As Object
+Dim msg As Object
+
+Set OA = Outlook.Application
+
+topik = fr.Range("C" & 3).Value
+waktu = fr.Range("C" & 4).Value
+materi = fr.Range("C" & 7).Value
+
+Dim last_row As Integer
+last_row = Application.CountA(sh.Range("A:A")) + 1
+
+For i = 3 To last_row
+    Set msg = OA.CreateItem(0)
+    msg.To = sh.Range("B" & i).Value
+    msg.Subject = fr.Range("C" & 6).Value
+    msg.HTMLBody = _
+        "<HTML><BODY>" _
+        & "Selamat pagi," & _
+        "<br />" _
+        & "Berikut kami lampirkan Sertifikat Webinar " & topik & " pada tanggal " & waktu & "." & _
+        "<br />" _
+        & "Jika terdapat kesalahan nama dan gelar mohon hubungi kami kembali." & _
+        "<br />" _
+        & "Atas perhatiannya kami ucapkan terimakasih." & _
+        "<br /> <br />" _
+        & materi & _
+        "</BODY></HTML>"
+    
+    If sh.Range("C" & i).Value <> "" Then
+        msg.Attachments.Add sh.Range("C" & i).Value
+    End If
+    
+    msg.Send
+    
+    sh.Range("D" & i).Value = "Terkirim"
+
+Next i
+
+MsgBox "Semua pesan telah berhasil terkirim"
+
+End Sub
+
